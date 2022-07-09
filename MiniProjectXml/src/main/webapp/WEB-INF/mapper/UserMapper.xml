@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+												"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserMapper">
+	<insert id="addUserInfo"
+		parameterType="com.perceptron.vo.UserVO">
+		<selectKey keyProperty="user_idx" order="BEFORE"
+			resultType="java.lang.Integer">
+			SELECT NVL(MAX(user_idx)+1, 1) FROM user_table
+		</selectKey>
+		<![CDATA[
+			INSERT INTO user_table (user_idx, user_name, user_id, user_pw)
+			    VALUES( #{user_idx}, #{user_name}, #{user_id}, #{user_pw}) 
+		]]>
+	</insert>
+
+	<select id="checkUserIdExist" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		<![CDATA[
+			SELECT user_name FROM user_table WHERE user_id=#{user_id} and rownum=1
+		]]>
+	</select>
+
+	<select id="getLoginUserInfo"
+		parameterType="com.perceptron.vo.UserVO"
+		resultType="com.perceptron.vo.UserVO">
+		<![CDATA[
+			SELECT user_idx, user_name, user_pw 
+			FROM user_table 
+			WHERE user_id=#{user_id}
+			AND user_pw=#{user_pw}
+		]]>
+	</select>
+
+	<update id="modifyUserInfo"
+		parameterType="com.perceptron.vo.UserVO">
+	<![CDATA[
+			UPDATE user_table
+	    SET user_pw  = #{user_pw}
+	    WHERE user_idx = #{user_idx}
+		]]>
+	</update>
+
+	<select id="getModifyUserInfo" parameterType="java.lang.Integer"
+		resultType="com.perceptron.vo.UserVO">
+	<![CDATA[
+		SELECT user_idx, user_id, user_name,user_pw
+		FROM user_table
+		WHERE user_idx =#{user_idx}
+	]]>
+	</select>
+</mapper>

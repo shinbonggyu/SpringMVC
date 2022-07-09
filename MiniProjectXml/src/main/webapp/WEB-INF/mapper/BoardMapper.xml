@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BoardMapper">
+	<select id="addUserInfo"
+		resultType="com.perceptron.vo.BoardInfoVO">
+		<![CDATA[
+		SELECT board_info_idx, board_info_name
+		  FROM board_info_table
+		 ORDER BY board_info_idx
+		]]>
+	</select>
+	<select id="getBoardInfoName" parameterType="java.lang.Integer"
+		resultType="java.lang.String">
+		<![CDATA[
+		SELECT board_info_name
+		  FROM board_info_table
+		 WHERE board_info_idx=#{board_info_idx}
+		]]>
+	</select>
+	
+	<insert id="addContentInfo" parameterType="com.perceptron.vo.ContentVO">
+			<selectKey keyProperty="content_idx" resultType="java.lang.Integer" order = "BEFORE">
+				<![CDATA[
+				SELECT NVL(MAX(content_idx)+1, 1) FROM content_table
+				]]>
+			</selectKey> 
+			<![CDATA[
+			INSERT INTO content_table( 
+				        content_idx,     content_subject,       content_text 
+				      , content_file,    content_writer_idx,    content_board_idx
+				      , content_date)
+				 VALUES (#{content_idx},  #{content_subject},    #{content_text, jdbcType=VARCHAR}
+				      ,  #{content_file, jdbcType=VARCHAR}, #{content_writer_idx}, #{content_board_idx}
+				      ,  SYSDATE)
+			]]>
+	</insert>
+	<select id="getContentList" parameterType="java.lang.Integer" resultType="com.perceptron.vo.ContentVO">
+		<![CDATA[
+		SELECT a1.content_idx, a1.content_subject, a2.user_name as content_writer_name
+             , TO_CHAR(a1.content_date,'yyyy-mm-dd') as content_date
+		  FROM content_table a1
+             , user_table a2
+		 WHERE a1.content_writer_idx = a2.user_idx
+           AND a1.content_board_idx = #{content_board_idx}
+		 ORDER BY a1.content_idx DESC
+		]]>
+	</select>
+	<select id="getContentCnt" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		<![CDATA[
+		SELECT count(content_board_idx)
+		  FROM content_table
+		 WHERE content_board_idx=#{content_board_idx}
+		]]>
+	</select>
+		<select id="getContentInfo" parameterType="java.lang.Integer" resultType="com.perceptron.vo.ContentVO">
+		<![CDATA[
+		SELECT a1.content_idx,  a1.content_subject,    a1.content_text
+    		 , a1.content_file, a1.content_writer_idx, a2.user_name as content_writer_name
+    		 , a1.content_board_idx, TO_CHAR(a1.content_date,'yyyy-mm-dd') as content_date
+		  FROM content_table a1
+             , user_table a2
+		 WHERE a1.content_writer_idx = a2.user_idx
+           AND a1.content_idx = #{content_idx}
+		]]>
+	</select>
+	
+	<update id="modifyContentInfo" parameterType="com.perceptron.vo.ContentVO">
+		<![CDATA[
+		UPDATE content_table
+           SET content_subject = #{content_subject}, content_text = #{content_text}
+    		 , content_file = #{content_file, jdbcType=VARCHAR}
+         WHERE content_idx = #{content_idx}
+		]]>
+	</update>
+	
+	<delete id="deleteContentInfo" parameterType="java.lang.Integer">
+		<![CDATA[
+		DELETE FROM content_table where content_idx = #{content_idx}
+		]]>
+	</delete>
+</mapper>
