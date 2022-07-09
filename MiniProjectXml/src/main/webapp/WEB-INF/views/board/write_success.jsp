@@ -5,5 +5,5 @@
 
 <script>
 	alert('게시판이 작성되었습니다')
-	location.href="${root }board/read?board_info_idx=${writeContentVO.content_board_idx}&content_idx=${writeContentVO.content_idx}"
+	location.href="${root }board/read?board_info_idx=${writeContentVO.content_board_idx}&content_idx=${writeContentVO.content_idx}&page=1"
 </script>
